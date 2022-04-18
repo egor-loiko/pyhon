@@ -1,18 +1,15 @@
-# m = int(input("Введите первое число: \n"))
-# n = int(input("Введите второе число: \n"))
-# p = int(input("Введите третье число: \n"))
+# Шестизначный автобусный билет считается удачным, если сумма его цифр делится на 7. Могут ли два билета подряд быть удачными?
 
-A = []
-A.append(int(input("Введите первое число: \n")))
-A.append(int(input("Введите второе число: \n")))
-A.append(int(input("Введите третье число: \n")))
+def is_sum_seven(n):
+    A = list(str(n))
+    temp = 0
+    for i in range(len(A)):
+        temp += int(A[i])
+    if temp % 7 == 0:
+        return True
+    else:
+        return False
 
-for i in range(len(A)):
-    print(str(i + 1) + "е число: " + str(A[i]))
-
-count = 0
-for x in range(len(A)):
-    if A[x] < 0:
-        count += 1
-
-print("Количество нечетных чисел: " + str(count))
+for x in range(100000, 1000000):
+    if is_sum_seven(x) and is_sum_seven(x + 1):
+            print("Cумма цифр в числах " + str(x) + " и " + str(x + 1) + " делятся на 7")
