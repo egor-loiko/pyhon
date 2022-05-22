@@ -14,8 +14,8 @@ for i in range(n):
             if A[i][j] != A[j][i]:
                 simIndicator = False
                 break
-        else:
-            break
+    else:
+        break
 if simIndicator:
     print("Матрица симмметрична")
 else:
