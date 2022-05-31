@@ -61,41 +61,43 @@ for N in range(1000,5001,1000):
     for i in range (N):
         A.append(int(round(random.random()*(max-min)+min)))
 
-    print(A)
-
     B = A.copy()
     C = A.copy()
-    # print(B)
-    # print(C)
-    #
-    # BubbleSort(A)
-    # print("---")
-    # print(A)
-    #
-    #
-    # QuickSort(B, 0, len(B)-1)
-    # print("---")
-    # print(B)
-    #
-    # SelectSort(C)
-    # print("---")
-    # print(C)
+    A1 = A.copy()
+    B1 = A.copy()
+    C1 = A.copy()
+
+    print(A)
+    print(B)
+    print(C)
+
+    BubbleSort(A)
+    print("---")
+    print(A)
+
+    QuickSort(B, 0, len(B)-1)
+    print("---")
+    print(B)
+
+    SelectSort(C)
+    print("---")
+    print(C)
 
 
     t1 = datetime.datetime.now()
-    BubbleSort(A)
+    BubbleSort(A1)
     t2 = datetime.datetime.now()
     y1.append((t2-t1).total_seconds())
     print("Пузырьковая сортировка   " +str(N)+"   заняла   "+str((t2-t1).total_seconds()) + "c")
 
     t3 = datetime.datetime.now()
-    QuickSort(B, 0, len(B)-1)
+    QuickSort(B1, 0, len(B1)-1)
     t4 = datetime.datetime.now()
     y2.append((t4 - t3).total_seconds())
     print("Быстрая   " +str(N)+"   заняла   "+str((t4-t3).total_seconds()) + "c")
 
     t5 = datetime.datetime.now()
-    SelectSort(B)
+    SelectSort(C1)
     t6 = datetime.datetime.now()
     y3.append((t6 - t5).total_seconds())
     print("Select   " + str(N) + "   заняла   " + str((t6 - t5).total_seconds()) + "c")
