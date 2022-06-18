@@ -15,24 +15,41 @@ class Book:
     book_binding_type = 'soft'
     book_list = []
 
-    def __init__(self, book_id, book_name, book_author, book_publishing_house, book_year, book_pages, book_price,
-                 book_binding_type):
-        self.book_id = book_id
-        self.book_name = book_name
-        self.book_author = book_author
-        self.book_publishing_house = book_publishing_house
-        self.book_year = book_year
-        self.book_pages = book_pages
-        self.book_price = book_price
-        self.book_binding_type = book_binding_type
-        print("\33[32m\033[1m {}".format('Book is successfully added'))
-        print("\33[0m {}".format(''))
+    # def __int__(self):
+    #     pass
+
+    # def __init__(self, book_id, book_name, book_author, book_publishing_house, book_year, book_pages, book_price,
+    #              book_binding_type):
+    #     self.book_id = book_id
+    #     self.book_name = book_name
+    #     self.book_author = book_author
+    #     self.book_publishing_house = book_publishing_house
+    #     self.book_year = book_year
+    #     self.book_pages = book_pages
+    #     self.book_price = book_price
+    #     self.book_binding_type = book_binding_type
+    #
 
     def get_book_id(self):
         return self.book_id
 
     def set_book_id(self, book_id):
-        self.book_id = book_id
+        if not self.is_book_id_exist(book_id):
+            self.book_id = book_id
+        else:
+            print("\33[31m\033[1m {}".format('Same Book ID already exist'))
+            print("\33[0m {}".format('Enter another book ID'))
+            book_id1 = int(input('Enter Book ID: '))
+            self.book_id = self.set_book_id(book_id1)
+        return self.get_book_id()
+
+    def is_book_id_exist(self, book_id):
+        if Book.get_book_list():
+            for i in range(len(Book.book_list)):
+                if Book.book_list[i].get_book_id() == book_id:
+                    return True
+        else:
+            return False
 
     def get_book_name(self):
         return self.book_name
@@ -110,20 +127,33 @@ class Book:
 
 add_new_book = 'yes'
 while add_new_book.casefold() == 'yes':
-    print('Do you want to add new Book (Yes/No): ')
+    print('\nDo you want to add new Book (Yes/No): ')
     add_new_book = input()
     if add_new_book.casefold() == 'yes':
+        book = Book()
         book_id = int(input('Enter Book Id: '))
+        book.set_book_id(book_id)
         book_name = input('Enter Book Name: ')
+        book.set_book_name(book_name)
         book_author = input('Enter Book Author: ')
+        book.set_book_author(book_author)
         book_publishing_house = input('Enter Book Publishing House: ')
+        book.set_book_publishing_house(book_publishing_house)
         book_year = int(input('Enter Book Year: '))
+        book.set_book_year(book_year)
         book_pages = int(input('Enter Book pages: '))
+        book.set_book_pages(book_pages)
         book_price = int(input('Enter Book price: '))
+        book.set_book_price(book_price)
         book_binding_type = input('Enter Book Binding Type: ')
-        Book.add_book_to_list(
-            Book(book_id, book_name, book_author, book_publishing_house, book_year, book_pages, book_price,
-                 book_binding_type))
+        book.set_book_binding_type(book_binding_type)
+        Book.add_book_to_list(book)
+        print("\33[32m\033[1m {}".format('Book is successfully added'))
+        print("\33[0m {}".format('Added Book: '))
+        print(book)
+        # Book.add_book_to_list(
+        #     Book(book_id, book_name, book_author, book_publishing_house, book_year, book_pages, book_price,
+        #          book_binding_type))
     else:
         if Book.book_list:
             option = 1
@@ -135,19 +165,20 @@ while add_new_book.casefold() == 'yes':
                 print('0 - Exit')
                 option = int(input('Select an option: '))
                 if option == 1:
-                    print('Option 1 is selected')
+                    #print('Option 1 is selected')
                     author_name = input('\nEnter author name: ')
                     Book.find_book_by_author(author_name)
                 elif option == 2:
-                    print('Option 2 is selected')
+                    #print('Option 2 is selected')
                     year = int(input('\nEnter Year: '))
                     Book.find_book_by_year_greater(year)
                 elif option == 3:
-                    print('Option 3 is selected')
+                    #print('Option 3 is selected')
+                    print('\nLIST OF BOOKS: ')
                     Book.print_book_list()
                 else:
-                    print('Exit selected')
-                    print("\033[36m {}".format('Good Bye!'))
+                    #print('Exit selected')
+                    print("\033[36m {}".format('\nGood Bye!'))
                     option = 0
         else:
-            print("\033[36m {}".format('Ok, Good Bye!'))
+            print("\033[36m {}".format('\nOk, Good Bye!'))
