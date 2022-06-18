@@ -25,6 +25,8 @@ class Book:
         self.book_pages = book_pages
         self.book_price = book_price
         self.book_binding_type = book_binding_type
+        print("\33[32m\033[1m {}".format('Book is successfully added'))
+        print("\33[0m {}".format(''))
 
     def get_book_id(self):
         return self.book_id
@@ -87,6 +89,18 @@ class Book:
         for i in range(len(Book.book_list)):
             print(Book.book_list[i])
 
+    @classmethod
+    def find_book_by_author(cls, author_name):
+        for i in range(len(cls.book_list)):
+            if cls.book_list[i].book_author.casefold() == author_name.casefold():
+                print(cls.book_list[i])
+
+    @classmethod
+    def find_book_by_year_greater(cls, year):
+        for i in range(len(cls.book_list)):
+            if cls.book_list[i].book_year >= year:
+                print(cls.book_list[i])
+
     def __str__(self):
         return 'Book ID = ' + str(
             self.book_id) + '; Book Name  = ' + self.book_name + '; Book Author = ' + self.book_author + '; Book Publishing House = ' + self.book_publishing_house + '; Book year = ' + str(
@@ -94,10 +108,46 @@ class Book:
             self.book_price) + '; Book Binding = ' + self.book_binding_type
 
 
-book1 = Book(1, 'Gold', 'Abrams', 'Astoria', 1905, 110, 555, 'hard')
-book2 = Book(2,'Silver', 'Simons', 'Peresvet', 1891, 205, 1100, 'soft')
-
-Book.add_book_to_list(book1)
-Book.add_book_to_list(book2)
-
-Book.print_book_list()
+add_new_book = 'yes'
+while add_new_book.casefold() == 'yes':
+    print('Do you want to add new Book (Yes/No): ')
+    add_new_book = input()
+    if add_new_book.casefold() == 'yes':
+        book_id = int(input('Enter Book Id: '))
+        book_name = input('Enter Book Name: ')
+        book_author = input('Enter Book Author: ')
+        book_publishing_house = input('Enter Book Publishing House: ')
+        book_year = int(input('Enter Book Year: '))
+        book_pages = int(input('Enter Book pages: '))
+        book_price = int(input('Enter Book price: '))
+        book_binding_type = input('Enter Book Binding Type: ')
+        Book.add_book_to_list(
+            Book(book_id, book_name, book_author, book_publishing_house, book_year, book_pages, book_price,
+                 book_binding_type))
+    else:
+        if Book.book_list:
+            option = 1
+            while option != 0:
+                print('\nList of options')
+                print('1 - Find book by Author Name')
+                print('2 - Find book released after certain Year')
+                print('3 - List of books')
+                print('0 - Exit')
+                option = int(input('Select an option: '))
+                if option == 1:
+                    print('Option 1 is selected')
+                    author_name = input('\nEnter author name: ')
+                    Book.find_book_by_author(author_name)
+                elif option == 2:
+                    print('Option 2 is selected')
+                    year = int(input('\nEnter Year: '))
+                    Book.find_book_by_year_greater(year)
+                elif option == 3:
+                    print('Option 3 is selected')
+                    Book.print_book_list()
+                else:
+                    print('Exit selected')
+                    print("\033[36m {}".format('Good Bye!'))
+                    option = 0
+        else:
+            print("\033[36m {}".format('Ok, Good Bye!'))
