@@ -5,22 +5,11 @@
 # б) список книг, выпущенных после заданного года.
 
 class Book:
-    book_id = 0
-    book_name = 'noname'
-    book_author = 'none'
-    book_publishing_house = 'none'
-    book_year = 1900
-    book_pages = 0
-    book_price = 0
-    book_binding_type = 'soft'
     book_list = []
-
-    # def __int__(self):
-    #     pass
 
     # def __init__(self, book_id, book_name, book_author, book_publishing_house, book_year, book_pages, book_price,
     #              book_binding_type):
-    #     self.book_id = book_id
+    #     self.book_id = self.set_book_id(book_id)
     #     self.book_name = book_name
     #     self.book_author = book_author
     #     self.book_publishing_house = book_publishing_house
@@ -28,7 +17,6 @@ class Book:
     #     self.book_pages = book_pages
     #     self.book_price = book_price
     #     self.book_binding_type = book_binding_type
-    #
 
     def get_book_id(self):
         return self.book_id
@@ -37,10 +25,9 @@ class Book:
         if not self.is_book_id_exist(book_id):
             self.book_id = book_id
         else:
-            print("\33[31m\033[1m {}".format('Same Book ID already exist'))
-            print("\33[0m {}".format('Enter another book ID'))
-            book_id1 = int(input('Enter Book ID: '))
-            self.book_id = self.set_book_id(book_id1)
+            print("\33[31m\033[1m {}".format('Same Book ID already exist. Enter another book Id'))
+            book_id = int(input("\33[0m {}".format('Enter Book ID: ')))
+            self.book_id = self.set_book_id(book_id)
         return self.get_book_id()
 
     def is_book_id_exist(self, book_id):
@@ -102,21 +89,46 @@ class Book:
         Book.book_list.append(book)
 
     @staticmethod
-    def print_book_list():
+    def remove_book_from_list(book_id):
+        checker = 0
+        index_store = 0
         for i in range(len(Book.book_list)):
-            print(Book.book_list[i])
+            if Book.book_list[i].book_id == book_id:
+                index_store = i
+                checker = 1
+        if checker == 0:
+            print('Book with ID = \'' + str(book_id) + '\' doesn\'t exist in the List')
+        else:
+            Book.book_list.pop(index_store)
+            print('Book with ID = \'' + str(book_id) + '\' has been removed from the List!')
+
+    @staticmethod
+    def print_book_list():
+        if Book.book_list:
+            for i in range(len(Book.book_list)):
+                print(Book.book_list[i])
+        else:
+            print('List of book is empty!')
 
     @classmethod
     def find_book_by_author(cls, author_name):
+        checker = 0
         for i in range(len(cls.book_list)):
             if cls.book_list[i].book_author.casefold() == author_name.casefold():
                 print(cls.book_list[i])
+                checker = 1
+        if checker == 0:
+            print('Book with Author Name = \'' + author_name + '\' has not been found!')
 
     @classmethod
     def find_book_by_year_greater(cls, year):
+        checker = 0
         for i in range(len(cls.book_list)):
             if cls.book_list[i].book_year >= year:
                 print(cls.book_list[i])
+                checker = 1
+        if checker == 0:
+            print('No books have been found for provided conditions!')
 
     def __str__(self):
         return 'Book ID = ' + str(
@@ -125,60 +137,60 @@ class Book:
             self.book_price) + '; Book Binding = ' + self.book_binding_type
 
 
-add_new_book = 'yes'
-while add_new_book.casefold() == 'yes':
-    print('\nDo you want to add new Book (Yes/No): ')
-    add_new_book = input()
-    if add_new_book.casefold() == 'yes':
-        book = Book()
-        book_id = int(input('Enter Book Id: '))
-        book.set_book_id(book_id)
-        book_name = input('Enter Book Name: ')
-        book.set_book_name(book_name)
-        book_author = input('Enter Book Author: ')
-        book.set_book_author(book_author)
-        book_publishing_house = input('Enter Book Publishing House: ')
-        book.set_book_publishing_house(book_publishing_house)
-        book_year = int(input('Enter Book Year: '))
-        book.set_book_year(book_year)
-        book_pages = int(input('Enter Book pages: '))
-        book.set_book_pages(book_pages)
-        book_price = int(input('Enter Book price: '))
-        book.set_book_price(book_price)
-        book_binding_type = input('Enter Book Binding Type: ')
-        book.set_book_binding_type(book_binding_type)
-        Book.add_book_to_list(book)
-        print("\33[32m\033[1m {}".format('Book is successfully added'))
-        print("\33[0m {}".format('Added Book: '))
-        print(book)
-        # Book.add_book_to_list(
-        #     Book(book_id, book_name, book_author, book_publishing_house, book_year, book_pages, book_price,
-        #          book_binding_type))
+
+def create_new_book():
+    book = Book()
+    book_id = int(input('Enter Book Id: '))
+    book.set_book_id(book_id)
+    book_name = input('Enter Book Name: ')
+    book.set_book_name(book_name)
+    book_author = input('Enter Book Author: ')
+    book.set_book_author(book_author)
+    book_publishing_house = input('Enter Book Publishing House: ')
+    book.set_book_publishing_house(book_publishing_house)
+    book_year = int(input('Enter Book Year: '))
+    book.set_book_year(book_year)
+    book_pages = int(input('Enter Book pages: '))
+    book.set_book_pages(book_pages)
+    book_price = int(input('Enter Book price: '))
+    book.set_book_price(book_price)
+    book_binding_type = input('Enter Book Binding Type: ')
+    book.set_book_binding_type(book_binding_type)
+    # book = Book(book_id, book_name, book_author, book_publishing_house, book_year, book_pages, book_price, book_binding_type)
+    Book.add_book_to_list(book)
+    print("\33[32m\033[1m {}".format('Book is successfully added'))
+    print("\33[0m {}".format('Added Book: '))
+    print(book)
+
+option = 1
+while option != 0:
+    print('\nList of options. Please select one')
+    print('1 - Add a book')
+    print('2 - Delete book')
+    print('3 - List of books')
+    print('4 - Find book by Author Name')
+    print('5 - Find book released after certain Year')
+    print('0 - Exit')
+    option = int(input('\nEnter a number of option: '))
+    if option == 1:
+        print('Starting book creation')
+        create_new_book()
+    elif option == 2:
+        book_id = int(input('\nEnter book Id to remove: '))
+        Book.remove_book_from_list(book_id)
+    elif option == 3:
+        print('\nLIST OF BOOKS: ')
+        Book.print_book_list()
+    elif option == 4:
+        author_name = input('\nEnter author name: ')
+        Book.find_book_by_author(author_name)
+    elif option == 5:
+        year = int(input('\nEnter Year: '))
+        Book.find_book_by_year_greater(year)
+    elif option == 0:
+        print("\033[36m {}".format('\nGood Bye!'))
+        option = 0
     else:
-        if Book.book_list:
-            option = 1
-            while option != 0:
-                print('\nList of options')
-                print('1 - Find book by Author Name')
-                print('2 - Find book released after certain Year')
-                print('3 - List of books')
-                print('0 - Exit')
-                option = int(input('Select an option: '))
-                if option == 1:
-                    #print('Option 1 is selected')
-                    author_name = input('\nEnter author name: ')
-                    Book.find_book_by_author(author_name)
-                elif option == 2:
-                    #print('Option 2 is selected')
-                    year = int(input('\nEnter Year: '))
-                    Book.find_book_by_year_greater(year)
-                elif option == 3:
-                    #print('Option 3 is selected')
-                    print('\nLIST OF BOOKS: ')
-                    Book.print_book_list()
-                else:
-                    #print('Exit selected')
-                    print("\033[36m {}".format('\nGood Bye!'))
-                    option = 0
-        else:
-            print("\033[36m {}".format('\nOk, Good Bye!'))
+        print("\033[33m {}".format('\nThis option is not present in the list, please try again'))
+        print("\33[0m {}".format(''))
+        continue
