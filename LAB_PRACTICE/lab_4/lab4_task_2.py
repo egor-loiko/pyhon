@@ -137,7 +137,6 @@ class Book:
             self.__book_price) + '; Book Binding = ' + self.__book_binding_type
 
 
-
 def create_new_book():
     book = Book()
     book_id = int(input('Enter Book Id: '))
@@ -161,6 +160,7 @@ def create_new_book():
     print("\33[32m\033[1m {}".format('Book is successfully added'))
     print("\33[0m {}".format('Added Book: '))
     print(book)
+
 
 option = 1
 while option != 0:
