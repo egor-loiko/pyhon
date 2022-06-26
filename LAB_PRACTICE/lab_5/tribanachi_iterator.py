@@ -24,7 +24,7 @@ class TribanachiIterator:
             raise StopIteration
 
     def __iter__(self):
-        return TribanachiIterator(self.limit)
+        return self
 
 element = int(input('Введите длину ряда трибоначчи: '))
 tribananchi_iter = TribanachiIterator(element)
