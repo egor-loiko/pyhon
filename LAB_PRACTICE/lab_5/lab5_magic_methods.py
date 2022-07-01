@@ -139,7 +139,7 @@ class Book:
     def find_book_by_author(cls, author_name):
         checker = 0
         for i in range(len(cls.book_list)):
-            if cls.book_list[i].book_author.casefold() == author_name.casefold():
+            if author_name.casefold() in cls.book_list[i].book_author.casefold():
                 print(cls.book_list[i])
                 checker = 1
         if checker == 0:
