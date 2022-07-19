@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Address data</title>
+</head>
+<body>
+<h1>{{ person.person_text }}</h1>
+<p><strong>{{ method }}</strong></p>
+{% if error_message %}
+    <p>
+        <strong>{{ error_message }}</strong>
+    </p>
+{% endif %}
+
+
+<form action="address/" method="post">
+    {% csrf_token %}
+    {% for address in person.address_set.all %}
+{#        <input type="radio" name="option" id="option{{#}
+{#                forloop.counter }}" value="{{ option.id }}"/>#}
+        <label for="address{{ forloop.counter }}">
+        <label><b>Address:</b> </label>  {{ address.address }}<br>
+        <label><b>Phone:  </b></label>{{ address.phone }}
+        </label><br>
+    {% endfor %}
+{#    <input type="submit" value="Answer"/>#}
+</form>
+</body>
+</html>

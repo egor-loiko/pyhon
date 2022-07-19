@@ -7,17 +7,16 @@ def index(request):
     message = None
     if "message" in request.GET:
         message = request.GET["message"]
-# создание HTML-страницы по шаблону index.html
-# с заданными параметрами latest_riddles и message
+    # создание HTML-страницы по шаблону index.html
+    # с заданными параметрами latest_riddles и message
     return render(
         request,
         "index.html",
         {
-            "latest_riddles":
-               Riddle.objects.order_by('-pub_date')[:5],
+            "latest_riddles": Riddle.objects.order_by('-pub_date')[:5],
             "message": message
         }
-)
+    )
 
 
 # страница загадки со списком ответов
@@ -32,8 +31,7 @@ def detail(request, riddle_id):
             "riddle": get_object_or_404(Riddle, pk=riddle_id),
             "error_message": error_message
         }
-)
-
+    )
 
 
 # обработчик выбранного варианта ответа -
@@ -48,7 +46,7 @@ def answer(request, riddle_id):
         return redirect(
             '/riddles/' + str(riddle_id) +
             '?error_message=Option does not exist',
-)
+        )
     else:
         if option.correct:
             return redirect(
@@ -57,4 +55,4 @@ def answer(request, riddle_id):
             return redirect(
                 '/riddles/' + str(riddle_id) +
                 '?error_message=Wrong Answer!',
-)
+            )
