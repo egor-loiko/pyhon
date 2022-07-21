@@ -1,3 +1,6 @@
+import numpy
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import Riddle, Option
 
@@ -34,6 +37,10 @@ from .models import Mark
 # вычисление среднего,
 # например, средней оценки
 from django.db.models import Avg
+
+from django import forms
+from django.utils.translation import gettext, gettext_lazy as _
+
 
 
 
@@ -113,6 +120,57 @@ class PasswordChangeView(FormView):
         return super(PasswordChangeView, self).form_valid(form)
 
 
+class SubscribeForm(forms.Form):
+    # поле для ввода e-mail
+    email = forms.EmailField(
+        label=_("E-mail"),
+        required=True,
+    )
+
+    # конструктор для запоминания пользователя,
+    # которому задается e-mail
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+
+    # сохранение e-mail
+    def save(self, commit=True):
+        self.user.email = self.cleaned_data["email"]
+        if commit:
+            self.user.save()
+        return self.user
+
+
+# класс, описывающий взаимодействие логики
+# со страницами веб-приложения
+class SubscribeView(FormView):
+    # используем класс с логикой
+    form_class = SubscribeForm
+    # используем собственный шаблон
+    template_name = 'subscribe.html'
+    # после подписки возвращаем на главную станицу
+    success_url = app_url
+
+    # передача пользователя для конструктора класса с логикой
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    # вызов логики сохранения введенных данных
+    def form_valid(self, form):
+        form.save()
+        return HttpResponseRedirect(self.success_url)
+
+
+# функция для удаления подписки (форма не нужна,
+# поэтому без классов, просто функция)
+def unsubscribe(request):
+    request.user.email = ''
+    request.user.save()
+    return HttpResponseRedirect(app_url)
+
+
 # главная страница со списком загадок
 def index(request):
     message = None
@@ -135,10 +193,24 @@ def detail(request, riddle_id):
     error_message = None
     if "error_message" in request.GET:
         error_message = request.GET["error_message"]
+    # формируем список ответов
+    ordered_option_set = \
+        list(Option.objects.filter(riddle_id=riddle_id))
+    # формируем случайный порядок номеров ответов
+    option_iter = \
+        numpy.random.permutation(len(ordered_option_set))
+    # формируем новый список, в который выписываем ответы
+    # в сформированном случайном порядке
+    option_set = []
+    for num in option_iter:
+        option_set.append(ordered_option_set[num])
     return render(
         request,
         "answer.html",
         {
+            # передаем список ответов в случайном порядке
+            "option_set": option_set,
+
             "riddle": get_object_or_404(
                 Riddle, pk=riddle_id),
             "error_message": error_message,
@@ -242,3 +314,69 @@ def get_mark(request, riddle_id):
             .aggregate(Avg('mark'))
 
     return JsonResponse(json.dumps(res), safe=False)
+
+
+def admin(request):
+    message = None
+    if "message" in request.GET:
+        message = request.GET["message"]
+    # создание HTML-страницы по шаблону admin.html
+    # с заданными параметрами latest_riddles и message
+    return render(
+        request,
+        "admin.html",
+        {
+            "latest_riddles":
+                Riddle.objects.order_by('-pub_date')[:5],
+            "message": message,
+        }
+    )
+
+
+def post_riddle(request):
+    # защита от добавления загадок неадминистраторами
+    author = request.user
+    if not (author.is_authenticated and author.is_staff):
+        return HttpResponseRedirect(app_url+"admin")
+    # добавление загадки
+    rid = Riddle()
+    rid.riddle_text = request.POST['text']
+    rid.pub_date = datetime.now()
+    rid.save()
+    # добавление вариантов ответа
+    i = 1    # нумерация вариантов на форме начинается с 1
+    # количество вариантов неизвестно,
+    # поэтому ожидаем возникновение исключения,
+    # когда варианты кончатся
+    try:
+        while request.POST['option'+str(i)]:
+            opt = Option()
+            opt.riddle = rid
+            opt.text = request.POST['option'+str(i)]
+            opt.correct = (i == 1)
+            opt.save()
+            i += 1
+    # это ожидаемое исключение,
+    # при котором ничего делать не надо
+    except:
+        pass
+    # цикл по всем пользователям
+    for i in User.objects.all():
+        # проверка, что текущий пользователь подписан - указал e-mail
+        if i.email != '':
+            send_mail(
+                # тема письма
+                'New riddle',
+                # текст письма
+                'A new riddle was added on riddles portal:\n' +
+                'http://localhost:8000/riddles/' + str(rid.id) + '.',
+                # отправитель
+                'egor_test_python@mail.ru',
+                # список получателей из одного получателя
+                [i.email],
+                # отключаем замалчивание ошибок,
+                # чтобы из видеть и исправлять
+                False
+            )
+
+    return HttpResponseRedirect(app_url+str(rid.id))

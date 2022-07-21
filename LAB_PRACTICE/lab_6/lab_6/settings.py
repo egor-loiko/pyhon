@@ -40,7 +40,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crispy_forms',
+    # для API
+    'tastypie',
+
 ]
+
+# настройка отправки почты -
+# параметры подключения к почтовому SMTP-серверу
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_HOST_USER = 'egor_test_python@mail.ru'
+EMAIL_HOST_PASSWORD = 'NxVWCBxnFbknFvdtuBZV'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 

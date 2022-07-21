@@ -8,10 +8,11 @@
 {% endif %}
 <form action="answer/" method="post">
     {% csrf_token %}
-    {% for option in riddle.option_set.all %}
-        <input type="radio" name="option" 
-            id="option{{ forloop.counter }}" 
-            value="{{ option.id }}"/>
+    {% for option in option_set %}
+        <input type="radio"
+               name="option"
+               id="option{{ forloop.counter }}"
+               value="{{ option.id }}"/>
         <label for="option{{ forloop.counter }}">
             {{ option.text }}
         </label><br>
@@ -142,7 +143,7 @@ function parse_msg_update_response(data, success){
 
 function parse_mark_update_response(data, success){
     res = JSON.parse(data);
-    $("#avg_mark_span").html(res["mark__avg"].toFixed(1));
+    $("#avg_mark_span").html(res["mark__avg"].toFixed(2));
 }
 setInterval(send_msg_update_request, 5000);
 
