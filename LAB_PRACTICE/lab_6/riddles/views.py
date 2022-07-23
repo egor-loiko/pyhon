@@ -182,7 +182,7 @@ def index(request):
         request,
         "index.html",
         {
-            "latest_riddles": Riddle.objects.order_by('-pub_date')[:5],
+            "latest_riddles": Riddle.objects.order_by('-pub_date')[:15],
             "message": message
         }
     )
