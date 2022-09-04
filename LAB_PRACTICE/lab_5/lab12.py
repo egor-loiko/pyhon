@@ -1,5 +1,6 @@
 import unittest
-import calc
+import calc_app
+
 
 
 class CalcTest(unittest.TestCase):
@@ -19,15 +20,15 @@ class CalcTest(unittest.TestCase):
         print("Good bye method")
 
     def test_add(self):
-        self.assertEqual(calc.add(1, 2), 3)  # add assertion here
+        self.assertEqual(calc_app.add(1, 2), 3)  # add assertion here
         print("Test add")
 
     def test_sub(self):
-        self.assertEqual(calc.sub(5, 2), 3)
+        self.assertEqual(calc_app.sub(5, 2), 3)
         print("Test sub")
 
     def test_sub2(self):
-        self.assertGreater(calc.sub(5, 2), 2.9)
+        self.assertGreater(calc_app.sub(5, 2), 2.9)
         print("Test sub2")
 
 if __name__ == '__main__':
