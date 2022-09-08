@@ -22,6 +22,11 @@ from datetime import datetime
 # для ответа на асинхронный запрос в формате JSON
 from django.http import JsonResponse
 import json
+# оценки
+from .models import Mark
+# вычисление среднего,
+# например, средней оценки
+from django.db.models import Avg
 
 
 
@@ -58,7 +63,26 @@ def address(request, person_id):
         "latest_messages":
             Message.objects
                 .filter(chat_id=person_id)
-                .order_by('-pub_date')[:5]
+                .order_by('-pub_date')[:5],
+        # кол-во оценок, выставленных пользователем
+        "already_rated_by_user":
+            Mark.objects
+                .filter(author_id=request.user.id)
+                .filter(person_id=person_id)
+                .count(),
+        # оценка текущего пользователя
+        "user_rating":
+            Mark.objects
+                .filter(author_id=request.user.id)
+                .filter(person_id=person_id)
+                .aggregate(Avg('mark'))
+            ["mark__avg"],
+        # средняя по всем пользователям оценка
+        "avg_mark":
+            Mark.objects
+                .filter(person_id=person_id)
+                .aggregate(Avg('mark'))
+            ["mark__avg"]
 
     }
 )
@@ -164,5 +188,18 @@ def msg_list(request, person_id):
             )
     return JsonResponse(json.dumps(res), safe=False)
 
+def post_mark(request, person_id):
+    msg = Mark()
+    msg.author = request.user
+    msg.person = get_object_or_404(Person, pk=person_id)
+    msg.mark = request.POST['mark']
+    msg.pub_date = datetime.now()
+    msg.save()
+    return HttpResponseRedirect(app_url+str(person_id))
 
+def get_mark(request, person_id):
+    res = Mark.objects\
+            .filter(person_id=person_id)\
+            .aggregate(Avg('mark'))
 
+    return JsonResponse(json.dumps(res), safe=False)

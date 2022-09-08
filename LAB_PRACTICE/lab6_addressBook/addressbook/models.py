@@ -22,3 +22,9 @@ class Message(models.Model):
     author = models.ForeignKey(User, verbose_name='User', on_delete=models.CASCADE)
     message = models.TextField('Message')
     pub_date = models.DateTimeField('Message date', default=timezone.now)
+
+class Mark(models.Model):
+    person = models.ForeignKey(Person, verbose_name='Person', on_delete=models.CASCADE)
+    author = models.ForeignKey(User, verbose_name='User', on_delete=models.CASCADE)
+    mark = models.IntegerField(verbose_name='Mark')
+    pub_date = models.DateTimeField('Mark date', default=timezone.now)
