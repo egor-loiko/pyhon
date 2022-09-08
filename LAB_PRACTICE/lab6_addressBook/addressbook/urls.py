@@ -11,5 +11,8 @@ urlpatterns = [
     re_path(r'^password-change/', views.PasswordChangeView.as_view()),
 # отправка сообщения
     re_path(r'^([0-9]+)/post/$', views.post, name='post'),
+# отправка списка сообщений
+    re_path(r'^([0-9]+)/msg_list/$', views.msg_list, name='msg_list'),
+
 
 ]

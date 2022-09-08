@@ -19,6 +19,9 @@ from django.contrib.auth.forms import PasswordChangeForm
 # сообщения
 from .models import Message
 from datetime import datetime
+# для ответа на асинхронный запрос в формате JSON
+from django.http import JsonResponse
+import json
 
 
 
@@ -129,14 +132,37 @@ class PasswordChangeView(FormView):
         form.save()
         return super(PasswordChangeView, self).form_valid(form)
 
-def post(request, riddle_id):
+def post(request, person_id):
     msg = Message()
     msg.author = request.user
-    msg.chat = get_object_or_404(Person, pk=riddle_id)
+    msg.chat = get_object_or_404(Person, pk=person_id)
     msg.message = request.POST['message']
     msg.pub_date = datetime.now()
     msg.save()
-    return HttpResponseRedirect(app_url+str(riddle_id))
+    return HttpResponseRedirect(app_url+str(person_id))
+
+
+def msg_list(request, person_id):
+    # выбираем список сообщений
+    res = list(
+            Message.objects
+                # фильтруем по id персона
+                .filter(chat_id=person_id)
+                # отбираем 5 самых свежих
+                .order_by('-pub_date')[:5]
+                # выбираем необходимые поля
+                .values('author__username',
+                        'pub_date',
+                        'message'
+                )
+            )
+    # конвертируем даты в строки - сами они не умеют
+    for r in res:
+        r['pub_date'] = \
+            r['pub_date'].strftime(
+                '%d.%m.%Y %H:%M:%S'
+            )
+    return JsonResponse(json.dumps(res), safe=False)
 
 
 
