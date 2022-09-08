@@ -1,14 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Address book</title>
-</head>
-<body>
-<h1>Available Persons</h1>
-{% if message %}
-    <p><strong>{{ message }}</strong></p>
-{% endif %}
+{% extends 'base.html' %}
+{% block main %}
+    <h4 class="card-title">List of persons</h4>
+    {% if message %}
+        <p class="alert alert-success">
+            <strong>{{ message }}</strong>
+        </p>
+    {% endif %}
 {% if latest_persons %}
     <ul>
         {% for person in latest_persons %}
@@ -22,5 +19,4 @@
 {% else %}
     <p>No persons are available right now.</p>
 {% endif %}
-</body>
-</html>
+{% endblock %}

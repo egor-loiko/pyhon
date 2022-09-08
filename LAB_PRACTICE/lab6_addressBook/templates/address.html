@@ -1,20 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Address data</title>
-</head>
-<body>
-<h1>{{ person.person_text }}</h1>
-<p><strong>{{ method }}</strong></p>
+{% extends 'base.html' %}
+{% block main %}
+<h4 class="card-title">{{ riddle.riddle_text }}</h4>
 {% if error_message %}
-    <p>
+    <p class="alert alert-danger">
         <strong>{{ error_message }}</strong>
     </p>
 {% endif %}
 
 
+
 <form action="address/" method="post">
+
     {% csrf_token %}
     {% for address in person.address_set.all %}
 {#        <input type="radio" name="option" id="option{{#}
@@ -24,7 +20,48 @@
         <label><b>Phone:  </b></label>{{ address.phone }}
         </label><br>
     {% endfor %}
+<hr>
+<a href="/addressbook/" style="alignment: right">Back</a>
+
 {#    <input type="submit" value="Answer"/>#}
 </form>
-</body>
-</html>
+
+    <hr>
+<h4>Chat</h4>
+{% if user.is_authenticated %}
+    <form action="post/" method="post">
+    {% csrf_token %}
+    <div class="input-group mb-3">
+      <input type="text"
+             class="form-control"
+             placeholder="Your message"
+             name="message"/>
+      <div class="input-group-append">
+        <input class="btn btn-success"
+                type="submit"
+                value="Send"/>
+      </div>
+    </div>
+</form>
+{% endif %}
+
+<div id="history">
+    {% for message in latest_messages %}
+        <div class="card">
+        <div class="card-body">
+            <strong>
+                {{ message.author.username }}
+            </strong>
+            <br/>
+            <em>
+                {{ message.pub_date|date:'Y-m-d H:i:s' }}
+            </em>
+            <br/>
+            {{ message.message }}
+        </div>
+        </div>
+        <br/>
+    {% endfor %}
+</div>
+
+{% endblock %}
