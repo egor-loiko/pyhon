@@ -18,12 +18,12 @@
         <label for="address{{ forloop.counter }}">
         <label><h3>{{ address.person.person_text }}</h3> </label><br>
         <label><b>Address:</b> </label>  {{ address.address }}<br>
-        <label><b>Phone:  </b></label>{{ address.phone }}
+        <label><b>Phone:</b> </label> {{ address.phone }}
         </label><br>
     {% endfor %}
 <hr>
-<div style="text-align: left">
-<a href="/addressbook/" style="margin-left: 10pt">Back</a>
+<div style="text-align: right">
+<a href=".." class="btn btn-info">Back</a>
 </div>
 {#    <input type="submit" value="Answer"/>#}
 </form>
