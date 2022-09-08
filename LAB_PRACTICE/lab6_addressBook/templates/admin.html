@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block main %}
+    {% if user.is_staff %}
+        {% if message %}
+            <p class="alert alert-success">
+                <strong>{{ message }}</strong>
+            </p>
+        {% endif %}
+        <div class="card mb-3">
+        <div class="card-body">
+        <form action="../post_person/" method="post">
+            {% csrf_token %}
+            <h5>Add person:</h5>
+            <div class="mb-3">
+                <input class="form-control"
+                       placeholder="Enter Person name"
+                       name="person"
+                       required/>
+            </div>
+            <div class="card mb-3">
+            <div class="card-body" id="options_new">
+                <div class="mb-3">
+                    <input class="form-control"
+                           placeholder="Enter Address"
+                           name="Address"
+                           required/>
+                </div>
+                <div class="mb-3">
+                    <input class="form-control"
+                           placeholder="Enter Phone"
+                           name="Phone"
+                           required/>
+                </div>
+            </div>
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-success">
+                    Save
+                </button>
+                <a href="/addressbook/" id="cancel" name="cancel" class="btn btn-default">Cancel</a>
+            </div>
+        </form>
+        </div>
+        </div>
+        <div class="card mb-3">
+        <div class="card-body">
+        <h4 class="card-title">Available Persons</h4>
+        {% if latest_person %}
+            <ul>
+                {% for person in latest_person %}
+                    <li>
+                        <a href="/addressbook/{{ person.id }}/">
+                            {{ person.person_text }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No persons are available right now.</p>
+        {% endif %}
+        </div>
+        </div>
+
+     {% else %}
+        <h4>Access denied.</h4>
+    {% endif %}
+{% endblock %}

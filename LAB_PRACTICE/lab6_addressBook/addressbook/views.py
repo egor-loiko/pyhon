@@ -43,7 +43,7 @@ def index(request):
         "index.html",
     {
         "latest_persons":
-            Person.objects.order_by('person_text')[:5],
+            Person.objects.order_by('person_text')[:25],
             "message": message
     }
 )
@@ -203,3 +203,41 @@ def get_mark(request, person_id):
             .aggregate(Avg('mark'))
 
     return JsonResponse(json.dumps(res), safe=False)
+
+
+def admin(request):
+    message = None
+    if "message" in request.GET:
+        message = request.GET["message"]
+    # создание HTML-страницы по шаблону admin.html
+    # с заданными параметрами latest_riddles и message
+    return render(
+        request,
+        "admin.html",
+        {
+            "latest_person":
+                Person.objects.order_by('-pub_date')[:5],
+            "message": message,
+        }
+    )
+
+
+def post_person(request):
+    # защита от добавления персонов неадминистраторами
+    author = request.user
+    if not (author.is_authenticated and author.is_staff):
+        return HttpResponseRedirect(app_url+"admin")
+    # добавление персона
+    person = Person()
+    person.person_text = request.POST['person']
+    person.pub_date = datetime.now()
+    person.save()
+
+    # добавление адреса и телефона
+    address = Address()
+    address.person = person
+    address.address = request.POST['Address']
+    address.phone = request.POST['Phone']
+    address.save()
+
+    return HttpResponseRedirect(app_url+str(person.id))
