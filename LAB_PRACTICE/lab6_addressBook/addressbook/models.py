@@ -17,11 +17,13 @@ class Address(models.Model):
     address = models.CharField(max_length=255)
     phone = models.CharField(max_length=255)
 
+
 class Message(models.Model):
     chat = models.ForeignKey(Person, verbose_name='Chat under person', on_delete=models.CASCADE)
     author = models.ForeignKey(User, verbose_name='User', on_delete=models.CASCADE)
     message = models.TextField('Message')
     pub_date = models.DateTimeField('Message date', default=timezone.now)
+
 
 class Mark(models.Model):
     person = models.ForeignKey(Person, verbose_name='Person', on_delete=models.CASCADE)

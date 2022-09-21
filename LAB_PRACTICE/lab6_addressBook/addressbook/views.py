@@ -29,67 +29,73 @@ from .models import Mark
 from django.db.models import Avg
 
 
-
-
 # главная страница со списком персонов
 def index(request):
     message = None
     if "message" in request.GET:
         message = request.GET["message"]
-# создание HTML-страницы по шаблону index.html
-# с заданными параметрами latest_persons и message
+    # создание HTML-страницы по шаблону index.html
+    # с заданными параметрами latest_persons и message
     return render(
         request,
         "index.html",
-    {
-        "latest_persons":
-            Person.objects.order_by('person_text')[:25],
+        {
+            "latest_persons":
+                Person.objects.order_by('person_text')[:25],
             "message": message
-    }
-)
+        }
+    )
 
 
 # страница с адресом для персона
 def address(request, person_id):
     error_message = None
+    mark_date = None
     if "error_message" in request.GET:
         error_message = request.GET["error_message"]
+    mark_person = Mark.objects.filter(person_id=person_id).filter(author_id=request.user.id).all()
+    if mark_person:
+        mark_date = mark_person[0].pub_date
     return render(
         request,
         "address.html",
-    {
-        "person": get_object_or_404(Person, pk=person_id),
-        "error_message": error_message,
-        "latest_messages":
-            Message.objects
-                .filter(chat_id=person_id)
-                .order_by('-pub_date')[:5],
-        # кол-во оценок, выставленных пользователем
-        "already_rated_by_user":
-            Mark.objects
-                .filter(author_id=request.user.id)
-                .filter(person_id=person_id)
-                .count(),
-        # оценка текущего пользователя
-        "user_rating":
-            Mark.objects
-                .filter(author_id=request.user.id)
-                .filter(person_id=person_id)
-                .aggregate(Avg('mark'))
-            ["mark__avg"],
-        # средняя по всем пользователям оценка
-        "avg_mark":
-            Mark.objects
-                .filter(person_id=person_id)
-                .aggregate(Avg('mark'))
-            ["mark__avg"]
+        {
+            "person": get_object_or_404(Person, pk=person_id),
+            "error_message": error_message,
+            "latest_messages":
+                Message.objects
+                    .filter(chat_id=person_id)
+                    .order_by('-pub_date')[:5],
+            # кол-во оценок, выставленных пользователем
+            "already_rated_by_user":
+                Mark.objects
+                    .filter(author_id=request.user.id)
+                    .filter(person_id=person_id)
+                    .count(),
+            # оценка текущего пользователя
+            "user_rating":
+                Mark.objects
+                    .filter(author_id=request.user.id)
+                    .filter(person_id=person_id)
+                    .aggregate(Avg('mark'))
+                ["mark__avg"],
+            # средняя по всем пользователям оценка
+            "avg_mark":
+                Mark.objects
+                    .filter(person_id=person_id)
+                    .aggregate(Avg('mark'))
+                ["mark__avg"],
+            "mark_date":
+                mark_date
 
-    }
-)
+        }
+    )
+
 
 # базовый URL приложения, главной страницы -
 # часто нужен при указании путей переадресации
 app_url = "/addressbook/"
+
 
 # наше представление для регистрации
 class RegisterFormView(FormView):
@@ -104,6 +110,7 @@ class RegisterFormView(FormView):
     # Шаблон, который будет использоваться
     # при отображении представления.
     template_name = "reg/register.html"
+
     def form_valid(self, form):
         # Создаём пользователя,
         # если данные в форму были введены корректно.
@@ -121,6 +128,7 @@ class LoginFormView(FormView):
     template_name = "reg/login.html"
     # В случае успеха перенаправим на главную.
     success_url = app_url
+
     def form_valid(self, form):
         # Получаем объект пользователя
         # на основе введённых в форму данных.
@@ -128,6 +136,7 @@ class LoginFormView(FormView):
         # Выполняем аутентификацию пользователя.
         login(self.request, self.user)
         return super(LoginFormView, self).form_valid(form)
+
 
 class LogoutView(View):
     def get(self, request):
@@ -138,6 +147,7 @@ class LogoutView(View):
         # главную страницу.
         return HttpResponseRedirect(app_url)
 
+
 # наше представление для смены пароля
 class PasswordChangeView(FormView):
     # будем строить на основе
@@ -146,15 +156,18 @@ class PasswordChangeView(FormView):
     template_name = 'reg/password_change_form.html'
     # после смены пароля нужно снова входить
     success_url = app_url + 'login/'
+
     def get_form_kwargs(self):
         kwargs = super(PasswordChangeView, self).get_form_kwargs()
         kwargs['user'] = self.request.user
         if self.request.method == 'POST':
             kwargs['data'] = self.request.POST
         return kwargs
+
     def form_valid(self, form):
         form.save()
         return super(PasswordChangeView, self).form_valid(form)
+
 
 def post(request, person_id):
     msg = Message()
@@ -163,23 +176,23 @@ def post(request, person_id):
     msg.message = request.POST['message']
     msg.pub_date = datetime.now()
     msg.save()
-    return HttpResponseRedirect(app_url+str(person_id))
+    return HttpResponseRedirect(app_url + str(person_id))
 
 
 def msg_list(request, person_id):
     # выбираем список сообщений
     res = list(
-            Message.objects
-                # фильтруем по id персона
-                .filter(chat_id=person_id)
-                # отбираем 5 самых свежих
-                .order_by('-pub_date')[:5]
-                # выбираем необходимые поля
-                .values('author__username',
-                        'pub_date',
-                        'message'
-                )
-            )
+        Message.objects
+            # фильтруем по id персона
+            .filter(chat_id=person_id)
+            # отбираем 5 самых свежих
+            .order_by('-pub_date')[:5]
+            # выбираем необходимые поля
+            .values('author__username',
+                    'pub_date',
+                    'message'
+                    )
+    )
     # конвертируем даты в строки - сами они не умеют
     for r in res:
         r['pub_date'] = \
@@ -188,6 +201,7 @@ def msg_list(request, person_id):
             )
     return JsonResponse(json.dumps(res), safe=False)
 
+
 def post_mark(request, person_id):
     msg = Mark()
     msg.author = request.user
@@ -195,12 +209,13 @@ def post_mark(request, person_id):
     msg.mark = request.POST['mark']
     msg.pub_date = datetime.now()
     msg.save()
-    return HttpResponseRedirect(app_url+str(person_id))
+    return HttpResponseRedirect(app_url + str(person_id))
+
 
 def get_mark(request, person_id):
-    res = Mark.objects\
-            .filter(person_id=person_id)\
-            .aggregate(Avg('mark'))
+    res = Mark.objects \
+        .filter(person_id=person_id) \
+        .aggregate(Avg('mark'))
 
     return JsonResponse(json.dumps(res), safe=False)
 
@@ -226,7 +241,7 @@ def post_person(request):
     # защита от добавления персонов неадминистраторами
     author = request.user
     if not (author.is_authenticated and author.is_staff):
-        return HttpResponseRedirect(app_url+"admin")
+        return HttpResponseRedirect(app_url + "admin")
     # добавление персона
     person = Person()
     person.person_text = request.POST['person']
@@ -240,4 +255,4 @@ def post_person(request):
     address.phone = request.POST['Phone']
     address.save()
 
-    return HttpResponseRedirect(app_url+str(person.id))
+    return HttpResponseRedirect(app_url + str(person.id))
